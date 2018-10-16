@@ -19,7 +19,14 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var countDownTimer: CountDownTimer
     internal val initialCountDown : Long = 60000
     internal val countDownInterval: Long = 1000
+    internal var timeLeftOnTimer : Long = 60000
     internal  val TAG = MainActivity::class.java.simpleName
+
+    companion object {
+        private val SCORE_KEY = "SCORE_KEY"
+        private val TIME_LEFT_KEY= "TIME_LEFT_KEY"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +46,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(SCORE_KEY, score)
+        outState.putLong(TIME_LEFT_KEY, timeLeftOnTimer)
+        countDownTimer.cancel()
+        Log.d(TAG,"ini dari onSaveInstanceState saving Score = $score & Saving Time = $timeLeftOnTimer" )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"OnDestroy di panggil" )
+    }
+
     fun resetGame(){
             score = 0
             gameScoreTextView.setText(getString(R.string.your_score,score.toString()))
@@ -48,8 +68,11 @@ class MainActivity : AppCompatActivity() {
 
             countDownTimer = object: CountDownTimer (initialCountDown,countDownInterval){
                 override fun onTick(p0: Long) {
+                    timeLeftOnTimer = p0
+                    Log.d(TAG,"ini dari timeLeft p0 = $timeLeftOnTimer" )
                     val timeLeft = p0/1000
                     timeLeftTextView.setText(getString(R.string.time_left,timeLeft.toString()))
+
                 }
 
                 override fun onFinish() {
@@ -74,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
         score = score+1
         val newScore = getString(R.string.your_score,score.toString())
+        Log.d(TAG,"ini dari newscore tiap di klik  = $score" )
         gameScoreTextView.setText(newScore)
     }
 
