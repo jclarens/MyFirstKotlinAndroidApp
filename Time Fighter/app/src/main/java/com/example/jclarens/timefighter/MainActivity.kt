@@ -39,7 +39,15 @@ class MainActivity : AppCompatActivity() {
 //     1. gameScoreTextView.text = getString(R.string.your_score,score.toString())
 //     2. val a = getString(R.string.your_score,score.toString())
 //        gameScoreTextView.setText(a)
-        resetGame()
+
+        if (savedInstanceState !=null ){
+            score = savedInstanceState.getInt(SCORE_KEY)
+            timeLeftOnTimer = savedInstanceState.getLong(TIME_LEFT_KEY)
+            restoreGame()
+        }
+        else{
+            resetGame()
+        }
         tapMeButton.setOnClickListener { view ->
             incrementScore()
         }
@@ -80,7 +88,32 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             gameStarted = false
+            Toast.makeText(this, "gamestarted = $gameStarted", Toast.LENGTH_LONG).show()
         }
+
+    fun restoreGame(){
+        gameScoreTextView.setText(getString(R.string.your_score,score.toString()))
+
+        val restoredTime = timeLeftOnTimer/ 1000
+        timeLeftTextView.setText(getString(R.string.time_left,restoredTime.toString()))
+
+        countDownTimer = object: CountDownTimer (timeLeftOnTimer,countDownInterval){
+            override fun onTick(p0: Long) {
+                timeLeftOnTimer = p0
+                Log.d(TAG,"ini dari timeLeft p0 = $timeLeftOnTimer" )
+                val timeLeft = p0/1000
+                timeLeftTextView.setText(getString(R.string.time_left,timeLeft.toString()))
+
+            }
+
+            override fun onFinish() {
+                endGame()
+            }
+        }
+        countDownTimer.start()
+        gameStarted = true
+    }
+
     private fun startGame(){
         countDownTimer.start()
         gameStarted = true
